@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:note_app/screens/splash_screen.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  var box = Hive.box('names');
   runApp(const MyApp());
 }
 
