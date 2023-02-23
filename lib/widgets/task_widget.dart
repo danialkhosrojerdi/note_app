@@ -67,7 +67,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                         children: [
                           _getbadge(
                               'time',
-                              '${widget.task.dateTime.hour} : ${widget.task.dateTime.minute}',
+                              '${widget.task.dateTime.hour} : ${getCorrectMinute(widget.task.dateTime)}',
                               AppColors.primaryGreen,
                               Colors.white),
                           const SizedBox(
@@ -134,4 +134,12 @@ Container _getbadge(String iconName, String badgeText, Color badgeBgColor,
       ),
     ),
   );
+}
+
+String getCorrectMinute(DateTime time) {
+  if (time.minute < 10) {
+    return '0${time.minute}';
+  } else {
+    return time.minute.toString();
+  }
 }

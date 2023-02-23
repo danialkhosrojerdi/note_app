@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:note_app/constants/colors.dart';
 import 'package:note_app/models/task.dart';
+import 'package:note_app/models/utility.dart';
 import 'package:time_pickerr/time_pickerr.dart';
+
+import '../widgets/task_type_widget.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({Key? key}) : super(key: key);
@@ -29,76 +32,97 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             const SizedBox(height: 20),
             _getTextField('توضیحات تسک', 2, controllerTaskSubTitle),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45),
-              child: ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return CustomHourPicker(
-                        title: 'زمان انجام تسک را انتخاب نمایید',
-                        negativeButtonText: 'لغو',
-                        positiveButtonText: 'انتخاب زمان',
-                        titleStyle: TextStyle(color: AppColors.primaryGreen),
-                        positiveButtonStyle:
-                            TextStyle(color: AppColors.primaryGreen),
-                        negativeButtonStyle: const TextStyle(
-                            color: Color.fromARGB(255, 245, 76, 76)),
-                        elevation: 2,
-                        onPositivePressed: (context, time) {
-                          _time = time;
-                          Navigator.pop(context);
-                        },
-                        onNegativePressed: (context) {
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
+            _getAddTimeForTaskBtn(context),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 170,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: taskTypeList.length,
+                itemBuilder: (context, index) {
+                  return TaskTypeListWidget(
+                    tasktype: taskTypeList[index],
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 45),
-                    elevation: 0,
-                    backgroundColor: AppColors.lightGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    )),
-                child: Text(
-                  'انتخاب زمان انجام تسک',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
               ),
             ),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45),
-              child: ElevatedButton(
-                onPressed: () {
-                  String taskTitle = controllerTaskTitle.text;
-                  String taskSubTitle = controllerTaskSubTitle.text;
-                  addTask(taskTitle, taskSubTitle);
-                  Navigator.of(context).pop();
-                },
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 45),
-                    elevation: 0,
-                    backgroundColor: AppColors.primaryGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    )),
-                child: const Text(
-                  'اضافه کردن تسک',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            )
+            _getAddTaskButton(context)
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getAddTimeForTaskBtn(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 45),
+      child: ElevatedButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return CustomHourPicker(
+                title: 'زمان انجام تسک را انتخاب نمایید',
+                negativeButtonText: 'لغو',
+                positiveButtonText: 'انتخاب زمان',
+                titleStyle: TextStyle(color: AppColors.primaryGreen),
+                positiveButtonStyle: TextStyle(color: AppColors.primaryGreen),
+                negativeButtonStyle:
+                    const TextStyle(color: Color.fromARGB(255, 245, 76, 76)),
+                elevation: 2,
+                onPositivePressed: (context, time) {
+                  _time = time;
+                  Navigator.pop(context);
+                },
+                onNegativePressed: (context) {
+                  Navigator.pop(context);
+                },
+              );
+            },
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 45),
+          elevation: 0,
+          backgroundColor: AppColors.lightGreen,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text(
+          'انتخاب زمان انجام تسک',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryGreen,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _getAddTaskButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 45),
+      child: ElevatedButton(
+        onPressed: () {
+          String taskTitle = controllerTaskTitle.text;
+          String taskSubTitle = controllerTaskSubTitle.text;
+          addTask(taskTitle, taskSubTitle);
+          Navigator.of(context).pop();
+        },
+        style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 45),
+            elevation: 0,
+            backgroundColor: AppColors.primaryGreen,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            )),
+        child: const Text(
+          'اضافه کردن تسک',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

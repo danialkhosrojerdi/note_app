@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:note_app/constants/colors.dart';
 import 'package:note_app/models/task.dart';
+import 'package:time_pickerr/time_pickerr.dart';
 
 class EditTaskScreen extends StatefulWidget {
   EditTaskScreen({Key? key, required this.task}) : super(key: key);
@@ -15,6 +16,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   TextEditingController? controllerTaskTitle;
   TextEditingController? controllerTaskSubTitle;
   final taskBox = Hive.box<Task>('taskBox');
+  DateTime? _time;
 
   @override
   void initState() {
@@ -35,6 +37,52 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             _getTextField('عنوان تسک', 1, controllerTaskTitle!),
             const SizedBox(height: 20),
             _getTextField('توضیحات تسک', 2, controllerTaskSubTitle!),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 45),
+              child: ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return CustomHourPicker(
+                        title: 'زمان انجام تسک را انتخاب نمایید',
+                        negativeButtonText: 'لغو',
+                        positiveButtonText: 'انتخاب زمان',
+                        titleStyle: TextStyle(color: AppColors.primaryGreen),
+                        positiveButtonStyle:
+                            TextStyle(color: AppColors.primaryGreen),
+                        negativeButtonStyle: const TextStyle(
+                            color: Color.fromARGB(255, 245, 76, 76)),
+                        elevation: 2,
+                        onPositivePressed: (context, time) {
+                          _time = time;
+                          Navigator.pop(context);
+                        },
+                        onNegativePressed: (context) {
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 45),
+                  elevation: 0,
+                  backgroundColor: AppColors.lightGreen,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'تغییر زمان انجام تسک',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 45),
@@ -113,6 +161,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   editTask(String taskTitle, String taskSubTitle) {
     widget.task.taskTitle = taskTitle;
     widget.task.taskSubTitle = taskSubTitle;
+    widget.task.dateTime = _time!;
     widget.task.save();
   }
 }
