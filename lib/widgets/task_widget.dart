@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:msh_checkbox/msh_checkbox.dart';
 import 'package:note_app/models/task.dart';
+import 'package:note_app/screens/edit_task_screen.dart';
 
 import '../constants/colors.dart';
 
@@ -13,7 +13,7 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  bool isChecked = false;
+  bool isBoxChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,67 +23,82 @@ class _TaskWidgetState extends State<TaskWidget> {
   Widget _getTaskItem() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Container(
-        height: 130,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        MSHCheckbox(
-                          size: 30,
-                          value: isChecked,
-                          colorConfig:
-                              MSHColorConfig.fromCheckedUncheckedDisabled(
-                            checkedColor: AppColors.primaryGreen,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            isBoxChecked = !isBoxChecked;
+            widget.task.isDone = isBoxChecked;
+            widget.task.save();
+          });
+        },
+        child: Container(
+          height: 130,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Checkbox(
+                            value: widget.task.isDone,
+                            onChanged: (value) {},
                           ),
-                          style: MSHCheckboxStyle.fillScaleCheck,
-                          onChanged: (selected) {
-                            setState(() {
-                              isChecked = selected;
-                            });
-                          },
-                        ),
-                        Text(widget.task.taskTitle),
-                      ],
-                    ),
-                    Text(widget.task.taskSubTitle),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        _getbadge('time', '10:00', AppColors.primaryGreen,
-                            Colors.white),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        _getbadge('edit', 'ویرایش', AppColors.lightGreen,
-                            AppColors.primaryGreen),
-                      ],
-                    )
-                  ],
+                          Text(widget.task.taskTitle),
+                        ],
+                      ),
+                      Text(
+                        widget.task.taskSubTitle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          _getbadge(
+                              'time',
+                              '${widget.task.dateTime.hour} : ${widget.task.dateTime.minute}',
+                              AppColors.primaryGreen,
+                              Colors.white),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditTaskScreen(task: widget.task),
+                                ),
+                              );
+                            },
+                            child: _getbadge('edit', 'ویرایش',
+                                AppColors.lightGreen, AppColors.primaryGreen),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              Image.asset(
-                'images/banking.png',
-                height: 130,
-              ),
-            ],
+                const SizedBox(
+                  width: 20,
+                ),
+                Image.asset(
+                  'images/banking.png',
+                  height: 130,
+                ),
+              ],
+            ),
           ),
         ),
       ),
