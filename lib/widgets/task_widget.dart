@@ -94,7 +94,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   width: 20,
                 ),
                 Image.asset(
-                  'images/banking.png',
+                  widget.task.tasktype.image,
                   height: 130,
                 ),
               ],

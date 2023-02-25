@@ -19,6 +19,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final TextEditingController controllerTaskSubTitle = TextEditingController();
   final taskBox = Hive.box<Task>('taskBox');
   DateTime? _time;
+  int _selectedListItem = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,22 +35,35 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             const SizedBox(height: 20),
             _getAddTimeForTaskBtn(context),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 170,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: taskTypeList.length,
-                itemBuilder: (context, index) {
-                  return TaskTypeListWidget(
-                    tasktype: taskTypeList[index],
-                  );
-                },
-              ),
-            ),
+            _getTaskTypes(),
             const SizedBox(height: 20),
             _getAddTaskButton(context)
           ],
         ),
+      ),
+    );
+  }
+
+  SizedBox _getTaskTypes() {
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: taskTypeList.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              setState(() {
+                _selectedListItem = index;
+              });
+            },
+            child: TaskTypeListWidget(
+              tasktype: taskTypeList[index],
+              selectedItem: _selectedListItem,
+              selectedItemIndex: index,
+            ),
+          );
+        },
       ),
     );
   }
@@ -174,7 +188,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   addTask(String taskTitle, String taskSubTitle) {
     var task = Task(
-        taskTitle: taskTitle, taskSubTitle: taskSubTitle, dateTime: _time!);
+        taskTitle: taskTitle,
+        taskSubTitle: taskSubTitle,
+        dateTime: _time!,
+        tasktype: taskTypeList[_selectedListItem]);
     taskBox.add(task);
   }
 }

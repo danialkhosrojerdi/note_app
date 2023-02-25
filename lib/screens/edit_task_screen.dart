@@ -4,6 +4,9 @@ import 'package:note_app/constants/colors.dart';
 import 'package:note_app/models/task.dart';
 import 'package:time_pickerr/time_pickerr.dart';
 
+import '../models/utility.dart';
+import '../widgets/task_type_widget.dart';
+
 class EditTaskScreen extends StatefulWidget {
   EditTaskScreen({Key? key, required this.task}) : super(key: key);
   Task task;
@@ -17,6 +20,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   TextEditingController? controllerTaskSubTitle;
   final taskBox = Hive.box<Task>('taskBox');
   DateTime? _time;
+  int _selectedListItem = 0;
 
   @override
   void initState() {
@@ -24,6 +28,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     controllerTaskSubTitle =
         TextEditingController(text: widget.task.taskSubTitle);
     super.initState();
+
+    _selectedListItem = taskTypeList.indexWhere((element) {
+      return element.taskTypeEnum == widget.task.tasktype.taskTypeEnum;
+    });
   }
 
   @override
@@ -38,77 +46,110 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             const SizedBox(height: 20),
             _getTextField('توضیحات تسک', 2, controllerTaskSubTitle!),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45),
-              child: ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return CustomHourPicker(
-                        title: 'زمان انجام تسک را انتخاب نمایید',
-                        negativeButtonText: 'لغو',
-                        positiveButtonText: 'انتخاب زمان',
-                        titleStyle: TextStyle(color: AppColors.primaryGreen),
-                        positiveButtonStyle:
-                            TextStyle(color: AppColors.primaryGreen),
-                        negativeButtonStyle: const TextStyle(
-                            color: Color.fromARGB(255, 245, 76, 76)),
-                        elevation: 2,
-                        onPositivePressed: (context, time) {
-                          _time = time;
-                          Navigator.pop(context);
-                        },
-                        onNegativePressed: (context) {
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 45),
-                  elevation: 0,
-                  backgroundColor: AppColors.lightGreen,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'تغییر زمان انجام تسک',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ),
+            _getSetTimeBtn(context),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45),
-              child: ElevatedButton(
-                onPressed: () {
-                  String taskTitle = controllerTaskTitle!.text;
-                  String taskSubTitle = controllerTaskSubTitle!.text;
-                  editTask(taskTitle, taskSubTitle);
-                  Navigator.of(context).pop();
-                },
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 45),
-                    elevation: 0,
-                    backgroundColor: AppColors.primaryGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    )),
-                child: const Text(
-                  'ویرایش تسک',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            )
+            _getTaskTypes(),
+            const SizedBox(height: 20),
+            _getEditTaskBtn(context)
           ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox _getTaskTypes() {
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: taskTypeList.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              setState(() {
+                _selectedListItem = index;
+              });
+            },
+            child: TaskTypeListWidget(
+              tasktype: taskTypeList[index],
+              selectedItem: _selectedListItem,
+              selectedItemIndex: index,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Padding _getEditTaskBtn(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 45),
+      child: ElevatedButton(
+        onPressed: () {
+          String taskTitle = controllerTaskTitle!.text;
+          String taskSubTitle = controllerTaskSubTitle!.text;
+          editTask(taskTitle, taskSubTitle);
+          Navigator.of(context).pop();
+        },
+        style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 45),
+            elevation: 0,
+            backgroundColor: AppColors.primaryGreen,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            )),
+        child: const Text(
+          'ویرایش تسک',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding _getSetTimeBtn(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 45),
+      child: ElevatedButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return CustomHourPicker(
+                title: 'زمان انجام تسک را انتخاب نمایید',
+                negativeButtonText: 'لغو',
+                positiveButtonText: 'انتخاب زمان',
+                titleStyle: TextStyle(color: AppColors.primaryGreen),
+                positiveButtonStyle: TextStyle(color: AppColors.primaryGreen),
+                negativeButtonStyle:
+                    const TextStyle(color: Color.fromARGB(255, 245, 76, 76)),
+                elevation: 2,
+                onPositivePressed: (context, time) {
+                  _time = time;
+                  Navigator.pop(context);
+                },
+                onNegativePressed: (context) {
+                  Navigator.pop(context);
+                },
+              );
+            },
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 45),
+          elevation: 0,
+          backgroundColor: AppColors.lightGreen,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text(
+          'تغییر زمان انجام تسک',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryGreen,
+          ),
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:note_app/constants/colors.dart';
+import 'package:note_app/models/utility.dart';
 import 'package:note_app/screens/add_task_screen.dart';
 import 'package:note_app/widgets/task_widget.dart';
 
